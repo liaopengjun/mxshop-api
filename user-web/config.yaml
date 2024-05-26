@@ -1,0 +1,29 @@
+name: user-web
+host: 127.0.0.1
+tags:
+port: 8081
+
+user_srv:
+  name: userServer
+  host: 127.0.0.1
+  port: 50051
+
+mysql:
+  host: 127.0.0.1
+  port: 3307
+  user: root
+  password: 123456
+  db: mxshop_user_srv
+
+consul:
+  host: 127.0.0.1
+  port: 8050
+
+jwt:
+  key: 123121321
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  expire: 3600
+
