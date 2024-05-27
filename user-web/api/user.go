@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -16,11 +15,11 @@ import (
 	"mxshop-api/user-web/request"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
 func Register(c *gin.Context) {
+
 	// 用户绑定请求参数
 	var userRegister = new(request.RegisterForm)
 	if err := c.ShouldBind(&userRegister); err != nil {
@@ -28,7 +27,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// 验证码
+	// 短信验证码
 
 	// 请求服务
 	user, err := global.UserSrvClient.CreateUser(context.Background(), &proto.CreateUserInfo{
@@ -36,6 +35,7 @@ func Register(c *gin.Context) {
 		PassWord: userRegister.PassWord,
 		Mobile:   userRegister.Mobile,
 	})
+
 	if err != nil {
 		zap.S().Errorf("[Register] 查询 【新建用户失败】失败: %s", err.Error())
 		HandleGrpcErrorToHttp(err, c)
@@ -79,13 +79,20 @@ func PassWordLogin(c *gin.Context) {
 		return
 	}
 	// 验证码校验
+	isVerify := store.Verify(userLogin.CaptchaId, userLogin.Captcha, false)
+	if !isVerify {
+		c.JSON(http.StatusBadRequest, map[string]string{
+			"msg": "验证码错误",
+		})
+		return
+	}
 
 	// 登录逻辑
 	// 用户是否存在
 	user, err := global.UserSrvClient.GetUserByMobile(context.Background(), &proto.MobileRequest{Mobile: userLogin.Mobile})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{
-			"mobile": "用户不存在",
+			"msg": "用户不存在",
 		})
 		return
 	}
@@ -96,7 +103,7 @@ func PassWordLogin(c *gin.Context) {
 	})
 	if err != nil || !passRes.Success {
 		c.JSON(http.StatusBadRequest, map[string]string{
-			"password": "登录失败",
+			"msg": "登录失败",
 		})
 	}
 	// 生成用户token
@@ -144,6 +151,7 @@ func GetUserDetail(c *gin.Context) {
 		"mobile":   rsp.Mobile,
 	})
 }
+
 func UpdateUser(c *gin.Context) {
 
 	var userUpdate = new(request.UpdateUserForm)
@@ -170,18 +178,6 @@ func UpdateUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{})
 
-}
-func HandleValidatorError(c *gin.Context, err error) {
-	errs, ok := err.(validator.ValidationErrors)
-	if !ok {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": err.Error(),
-		})
-	}
-	c.JSON(http.StatusBadRequest, gin.H{
-		"error": removeTopStruct(errs.Translate(global.Trans)),
-	})
-	return
 }
 
 func GetUserList(c *gin.Context) {
@@ -223,14 +219,6 @@ func GetUserList(c *gin.Context) {
 
 	reMap["data"] = result
 	c.JSON(http.StatusOK, reMap)
-}
-
-func removeTopStruct(fileds map[string]string) map[string]string {
-	rsp := map[string]string{}
-	for field, err := range fileds {
-		rsp[field[strings.Index(field, ".")+1:]] = err
-	}
-	return rsp
 }
 
 func HandleGrpcErrorToHttp(err error, c *gin.Context) {
