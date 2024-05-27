@@ -3,9 +3,12 @@ module mxshop-api
 go 1.22
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gin-gonic/gin v1.10.0
+	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
+	github.com/go-playground/validator/v10 v10.20.0
 	github.com/spf13/viper v1.18.2
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.64.0
@@ -19,8 +22,6 @@ require (
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/go-playground/locales v0.14.1 // indirect
-	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
