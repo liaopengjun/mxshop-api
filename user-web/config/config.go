@@ -16,9 +16,12 @@ type ConsulConfig struct {
 }
 
 type RedisConfig struct {
-	Host   string `mapstructure:"host" json:"host"`
-	Port   int    `mapstructure:"port" json:"port"`
-	Expire int    `mapstructure:"expire" json:"expire"`
+	Host     string `mapstructure:"host" json:"host"`
+	Port     int    `mapstructure:"port" json:"port"`
+	Expire   int    `mapstructure:"expire" json:"expire"`
+	DB       int    `mapstructure:"db" json:"db"`
+	Password string `mapstructure:"password" json:"password"`
+	PoolSize int    `mapstructure:"pool_size" json:"pool_size"`
 }
 
 type LogConfig struct {

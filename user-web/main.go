@@ -25,6 +25,7 @@ func main() {
 	if err := initialize.InitTrans("zh"); err != nil {
 		panic(err)
 	}
+	initialize.InitRedis()
 	//5. 注册验证器
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("mobile", myvalidator.ValidateMobile)
